@@ -20,19 +20,19 @@ rownames(prob_matrix)=Garden_names
 colnames(prob_matrix)=Plant_ids
 
 #Create fake color side bars
-Gardenclass_colors=sample(c("darkorchid","darkred"), length(Garden_names), replace = TRUE, prob = NULL)
-Gardencategory_colors=sample(c("green","darkgreen"), length(Garden_names), replace = TRUE, prob = NULL)
+GardenGender_colors=sample(c("darkorchid","darkred"), length(Garden_names), replace = TRUE, prob = NULL)
+GardenEconomy_colors=sample(c("green","darkgreen"), length(Garden_names), replace = TRUE, prob = NULL)
 subtype_colors=sample(c("red","blue","cyan","pink","yellow","green"), length(Plant_ids), replace = TRUE, prob = NULL)
-Mcolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-Ncolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-Tcolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-HER2colors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-PRcolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-ERcolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
-rlab=t(cbind(Gardenclass_colors,Gardencategory_colors))
-clab=cbind(subtype_colors,Mcolors,Ncolors,Tcolors,HER2colors,PRcolors,ERcolors)
-rownames(rlab)=c("Class","Category")
-colnames(clab)=c("Subtype","M","N","T","HER2","PR","ER")
+Qualitycolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+Yieldcolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+Productioncolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+Usefulnesscolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+Importancecolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+NutritionContributioncolors=sample(c("black","white","grey"), length(Plant_ids), replace = TRUE, prob = NULL)
+rlab=t(cbind(GardenGender_colors,GardenEconomy_colors))
+clab=cbind(subtype_colors,Qualitycolors,Yieldcolors,Productioncolors,Usefulnesscolors,Importancecolors,NutritionContributioncolors)
+rownames(rlab)=c("Gender","Economy")
+colnames(clab)=c("Subtype","Quality","Yield","Production","Usefulness","Importance","NutritionContribution")
 
 #Define custom dist and hclust functions for use with heatmaps
 mydist=function(c) {dist(c,method="euclidian")}
@@ -46,7 +46,7 @@ heatmap.3(prob_matrix, hclustfun=myclust, distfun=mydist, na.rm = TRUE, scale="n
           Rowv=TRUE, Colv=TRUE, ColSideColors=clab, RowSideColors=rlab, symbreaks=FALSE, key=TRUE, symkey=FALSE,
           density.info="none", trace="none", main=main_title, labCol=FALSE, labRow=Garden_names, cexRow=1, col=rev(heat.colors(75)),
           ColSideColorsSize=7, RowSideColorsSize=2, KeyValueName="Prob. Response")
-legend("topright",legend=c("Ornamental","Perennial","Annual","Shrub","Tree","Grass","","Poor(0)","Fair(1)","Good(2)","","Female","Male","","Subsistence","Tomato"),
-       fill=c("red","blue","cyan","pink","yellow","green","white","black","white","grey","white","darkorchid","darkred","white","green","darkgreen"), border=FALSE, bty="n", y.intersp = 0.7, cex=0.7)
+legend("topright",legend=c("Ornamental","Perennial","Annual","Shrub","Tree","Grass","","Poor (0)","Fair (1)","Good (2)","","Female","Male","","Subsistence","Sales"),
+       fill=c("red","blue","cyan","pink","yellow","green","white","white","grey","black","white","darkorchid","darkred","white","green","darkgreen"), border=FALSE, bty="n", y.intersp = 0.7, cex=0.7)
 dev.off()
 
