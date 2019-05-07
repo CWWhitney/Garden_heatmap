@@ -50,3 +50,5 @@ legend("topright",legend=c("Ornamental","Perennial","Annual","Shrub","Tree","Gra
        fill=c("red","blue","cyan","pink","yellow","green","white","white","grey","black","white","darkorchid","darkred","white","green","darkgreen"), border=FALSE, bty="n", y.intersp = 0.7, cex=0.7)
 dev.off()
 
+# note
+
