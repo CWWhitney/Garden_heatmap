@@ -23,3 +23,4 @@ rownames(row_annotation) <- c("Variable Y")
 
 heatmap.3(mat, RowSideColors=row_annotation, ColSideColors=column_annotation)
 
+#Cor's file from Github 
