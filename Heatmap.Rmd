@@ -24,11 +24,13 @@ knitr::opts_chunk$set(echo = TRUE)
 #packages in alphabetic order
 library(bayesplot)
 library(dplyr)
+library(ethnobotanyR)
 library(ggplot2)
 library(ggpubr)
 library(ggridges)
 library(ggstance)
 library(plyr)
+library(RColorBrewer)
 library(reshape)
 library(tidyverse) #tidyverse includes a number of useful packages
 ```
@@ -43,6 +45,7 @@ knitr::write_bib(c(.packages(),
                    'ggplot2', 
                    'ggridges', 
                    'plyr', 
+                   'RColorBrewer',
                    'reshape', 
                    'tidyverse'), 'packages.bib')
 ```
@@ -51,15 +54,15 @@ Homegarden studies often attempt to compare a collection of related variables. H
 
 Needless to say any aims objectives and hypotheses should be determined before any data is collected. Data visualization is a good time to get a clear sense for how your data looks, but is not the time to start making up hypotheses about it.
 
-## Creating a `heatmap.function`
+## Heatmap function
 
-We use a garden heatmap function `heatmap.function` after [obigriffith's heatmap.function](https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.function.R).
+We use a garden heatmap function `heatmap.function` after [obigriffith's heatmap.function](https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.function.R). We use `grDevices` heat.colors for filling the heatmap. Other colors can be chose from the `RColorBrewer` library [@R-RColorBrewer].
 
 ```{r heatmap.function, include=FALSE}
 heatmap.function <- function(x,
-                             Rowv = TRUE,
-                             Colv = if (symm)
-                               "Rowv"
+                             row_values = TRUE,
+                             cols_values = if (symm)
+                               "row_values"
                              else
                                TRUE,
                              distfun = dist,
@@ -68,7 +71,7 @@ heatmap.function <- function(x,
                              symm = FALSE,
                              scale = c("none", "row", "column"),
                              na.rm = TRUE,
-                             revC = identical(Colv, "Rowv"),
+                             revC = identical(cols_values, "row_values"),
                              add.expr,
                              breaks,
                              symbreaks = max(x < 0, na.rm = TRUE) ||
@@ -146,12 +149,12 @@ heatmap.function <- function(x,
       "specified can produce unpredictable results.",
       "Please consider using only one or the other."
     )
-  if (is.null(Rowv) || is.na(Rowv))
-    Rowv <- FALSE
-  if (is.null(Colv) || is.na(Colv))
-    Colv <- FALSE
-  else if (Colv == "Rowv" && !isTRUE(Rowv))
-    Colv <- FALSE
+  if (is.null(row_values) || is.na(row_values))
+    row_values <- FALSE
+  if (is.null(cols_values) || is.na(cols_values))
+    cols_values <- FALSE
+  else if (cols_values == "row_values" && !isTRUE(row_values))
+    cols_values <- FALSE
   if (length(di <- dim(x)) != 2 || !is.numeric(x))
     stop("`x' must be a numeric matrix")
   nr <- di[1]
@@ -162,51 +165,51 @@ heatmap.function <- function(x,
     stop("`margins' must be a numeric vector of length 2")
   if (missing(cellnote))
     cellnote <- matrix("", ncol = ncol(x), nrow = nrow(x))
-  if (!inherits(Rowv, "dendrogram")) {
-    if (((!isTRUE(Rowv)) || (is.null(Rowv))) && (dendrogram %in%
+  if (!inherits(row_values, "dendrogram")) {
+    if (((!isTRUE(row_values)) || (is.null(row_values))) && (dendrogram %in%
                                                  c("both", "row"))) {
-      if (is.logical(Colv) && (Colv))
+      if (is.logical(cols_values) && (cols_values))
         dendrogram <- "column"
       else
         dedrogram <- "none"
       warning(
-        "Discrepancy: Rowv is FALSE, while dendrogram is `",
+        "Discrepancy: row_values is FALSE, while dendrogram is `",
         dendrogram,
         "'. Omitting row dendogram."
       )
     }
   }
-  if (!inherits(Colv, "dendrogram")) {
-    if (((!isTRUE(Colv)) || (is.null(Colv))) && (dendrogram %in%
+  if (!inherits(cols_values, "dendrogram")) {
+    if (((!isTRUE(cols_values)) || (is.null(cols_values))) && (dendrogram %in%
                                                  c("both", "column"))) {
-      if (is.logical(Rowv) && (Rowv))
+      if (is.logical(row_values) && (row_values))
         dendrogram <- "row"
       else
         dendrogram <- "none"
       warning(
-        "Discrepancy: Colv is FALSE, while dendrogram is `",
+        "Discrepancy: cols_values is FALSE, while dendrogram is `",
         dendrogram,
         "'. Omitting column dendogram."
       )
     }
   }
-  if (inherits(Rowv, "dendrogram")) {
-    ddr <- Rowv
+  if (inherits(row_values, "dendrogram")) {
+    ddr <- row_values
     rowInd <- order.dendrogram(ddr)
   }
-  else if (is.integer(Rowv)) {
+  else if (is.integer(row_values)) {
     hcr <- hclustfun(distfun(x))
     ddr <- as.dendrogram(hcr)
-    ddr <- reorder(ddr, Rowv)
+    ddr <- reorder(ddr, row_values)
     rowInd <- order.dendrogram(ddr)
     if (nr != length(rowInd))
       stop("row dendrogram ordering gave index of wrong length")
   }
-  else if (isTRUE(Rowv)) {
-    Rowv <- rowMeans(x, na.rm = na.rm)
+  else if (isTRUE(row_values)) {
+    row_values <- rowMeans(x, na.rm = na.rm)
     hcr <- hclustfun(distfun(x))
     ddr <- as.dendrogram(hcr)
-    ddr <- reorder(ddr, Rowv)
+    ddr <- reorder(ddr, row_values)
     rowInd <- order.dendrogram(ddr)
     if (nr != length(rowInd))
       stop("row dendrogram ordering gave index of wrong length")
@@ -214,13 +217,13 @@ heatmap.function <- function(x,
   else {
     rowInd <- nr:1
   }
-  if (inherits(Colv, "dendrogram")) {
-    ddc <- Colv
+  if (inherits(cols_values, "dendrogram")) {
+    ddc <- cols_values
     colInd <- order.dendrogram(ddc)
   }
-  else if (identical(Colv, "Rowv")) {
+  else if (identical(cols_values, "row_values")) {
     if (nr != nc)
-      stop("Colv = \"Rowv\" but nrow(x) != ncol(x)")
+      stop("cols_values = \"row_values\" but nrow(x) != ncol(x)")
     if (exists("ddr")) {
       ddc <- ddr
       colInd <- order.dendrogram(ddc)
@@ -228,25 +231,25 @@ heatmap.function <- function(x,
     else
       colInd <- rowInd
   }
-  else if (is.integer(Colv)) {
+  else if (is.integer(cols_values)) {
     hcc <- hclustfun(distfun(if (symm)
       x
       else
         t(x)))
     ddc <- as.dendrogram(hcc)
-    ddc <- reorder(ddc, Colv)
+    ddc <- reorder(ddc, cols_values)
     colInd <- order.dendrogram(ddc)
     if (nc != length(colInd))
       stop("column dendrogram ordering gave index of wrong length")
   }
-  else if (isTRUE(Colv)) {
-    Colv <- colMeans(x, na.rm = na.rm)
+  else if (isTRUE(cols_values)) {
+    cols_values <- colMeans(x, na.rm = na.rm)
     hcc <- hclustfun(distfun(if (symm)
       x
       else
         t(x)))
     ddc <- as.dendrogram(hcc)
-    ddc <- reorder(ddc, Colv)
+    ddc <- reorder(ddc, cols_values)
     colInd <- order.dendrogram(ddc)
     if (nc != length(colInd))
       stop("column dendrogram ordering gave index of wrong length")
@@ -668,7 +671,7 @@ heatmap.function <- function(x,
 
 ## Simple heatmap
 
-Here is an example with few parameters. 
+Here is an example for running the `heatmap.function` on a data set with few parameters. 
  
 ```{r}
 
@@ -797,7 +800,7 @@ Create heatmap using the `heatmap.function`.
 
 ```{r, out.width = "100%", dpi=300}
 
-main_title = "Garden Response Predictions"
+main_title = "Garden Plant Abundance"
 
 par(cex.main = 1)
 heatmap.function(
@@ -808,8 +811,8 @@ heatmap.function(
   scale = "none",
   dendrogram = "both",
   margins = c(6, 12),
-  Rowv = TRUE,
-  Colv = TRUE,
+  row_values = TRUE,
+  cols_values = TRUE,
   ColSideColors = clab,
   RowSideColors = rlab,
   symbreaks = FALSE,
@@ -872,12 +875,14 @@ legend(
 
 ```
 
+# Make a PDF
+
 Create a pdf of the heatmap using `grDevices` [@R-base] and `heatmap.function`.
 
 ```{r offscreen}
 
-pdf(file="heatmap3_example.pdf")
-main_title="Garden Response Predictions"
+pdf(file="garden_heatmap.pdf")
+main_title="Garden Plant Abundance"
 
 par(cex.main=1)
 
@@ -889,8 +894,8 @@ heatmap.function(
   scale = "none",
   dendrogram = "both",
   margins = c(6, 12),
-  Rowv = TRUE,
-  Colv = TRUE,
+  row_values = TRUE,
+  cols_values = TRUE,
   ColSideColors = clab,
   RowSideColors = rlab,
   symbreaks = FALSE,
@@ -952,5 +957,24 @@ legend(
 )
 dev.off()
 ```
+
+## Ethnobotany heatmap
+
+Following the simple example above we run the `heatmap.function` for visualizing data typical collected in ethnobotany surveys. We use the `ethnobotanydata` data set from `ethnobotanyR` [@R-ethnobotanyR].
+ 
+```{r}
+
+ethno_matrix <- as.matrix(dplyr::select(ethnobotanydata, -sp_name, -informant))
+
+```
+
+Run the `heatmap.function` on the simple data.
+
+```{r ethno_heatmap}
+
+heatmap.function(ethno_matrix)
+
+```
+
 
 # References

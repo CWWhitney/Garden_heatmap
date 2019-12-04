@@ -17,9 +17,9 @@ This code creates a simple clustered heatmap based on [obigriffith's heatmap.fun
 
 ```{r heatmap.function, include=FALSE}
 heatmap.function <- function(x,
-                             Rowv = TRUE,
-                             Colv = if (symm)
-                               "Rowv"
+                             row_value = TRUE,
+                             cols_value = if (symm)
+                               "row_value"
                              else
                                TRUE,
                              distfun = dist,
@@ -28,7 +28,7 @@ heatmap.function <- function(x,
                              symm = FALSE,
                              scale = c("none", "row", "column"),
                              na.rm = TRUE,
-                             revC = identical(Colv, "Rowv"),
+                             revC = identical(cols_value, "row_value"),
                              add.expr,
                              breaks,
                              symbreaks = max(x < 0, na.rm = TRUE) ||
@@ -106,12 +106,12 @@ heatmap.function <- function(x,
       "specified can produce unpredictable results.",
       "Please consider using only one or the other."
     )
-  if (is.null(Rowv) || is.na(Rowv))
-    Rowv <- FALSE
-  if (is.null(Colv) || is.na(Colv))
-    Colv <- FALSE
-  else if (Colv == "Rowv" && !isTRUE(Rowv))
-    Colv <- FALSE
+  if (is.null(row_value) || is.na(row_value))
+    row_value <- FALSE
+  if (is.null(cols_value) || is.na(cols_value))
+    cols_value <- FALSE
+  else if (cols_value == "row_value" && !isTRUE(row_value))
+    cols_value <- FALSE
   if (length(di <- dim(x)) != 2 || !is.numeric(x))
     stop("`x' must be a numeric matrix")
   nr <- di[1]
@@ -122,51 +122,51 @@ heatmap.function <- function(x,
     stop("`margins' must be a numeric vector of length 2")
   if (missing(cellnote))
     cellnote <- matrix("", ncol = ncol(x), nrow = nrow(x))
-  if (!inherits(Rowv, "dendrogram")) {
-    if (((!isTRUE(Rowv)) || (is.null(Rowv))) && (dendrogram %in%
+  if (!inherits(row_value, "dendrogram")) {
+    if (((!isTRUE(row_value)) || (is.null(row_value))) && (dendrogram %in%
                                                  c("both", "row"))) {
-      if (is.logical(Colv) && (Colv))
+      if (is.logical(cols_value) && (cols_value))
         dendrogram <- "column"
       else
         dedrogram <- "none"
       warning(
-        "Discrepancy: Rowv is FALSE, while dendrogram is `",
+        "Discrepancy: row_value is FALSE, while dendrogram is `",
         dendrogram,
         "'. Omitting row dendogram."
       )
     }
   }
-  if (!inherits(Colv, "dendrogram")) {
-    if (((!isTRUE(Colv)) || (is.null(Colv))) && (dendrogram %in%
+  if (!inherits(cols_value, "dendrogram")) {
+    if (((!isTRUE(cols_value)) || (is.null(cols_value))) && (dendrogram %in%
                                                  c("both", "column"))) {
-      if (is.logical(Rowv) && (Rowv))
+      if (is.logical(row_value) && (row_value))
         dendrogram <- "row"
       else
         dendrogram <- "none"
       warning(
-        "Discrepancy: Colv is FALSE, while dendrogram is `",
+        "Discrepancy: cols_value is FALSE, while dendrogram is `",
         dendrogram,
         "'. Omitting column dendogram."
       )
     }
   }
-  if (inherits(Rowv, "dendrogram")) {
-    ddr <- Rowv
+  if (inherits(row_value, "dendrogram")) {
+    ddr <- row_value
     rowInd <- order.dendrogram(ddr)
   }
-  else if (is.integer(Rowv)) {
+  else if (is.integer(row_value)) {
     hcr <- hclustfun(distfun(x))
     ddr <- as.dendrogram(hcr)
-    ddr <- reorder(ddr, Rowv)
+    ddr <- reorder(ddr, row_value)
     rowInd <- order.dendrogram(ddr)
     if (nr != length(rowInd))
       stop("row dendrogram ordering gave index of wrong length")
   }
-  else if (isTRUE(Rowv)) {
-    Rowv <- rowMeans(x, na.rm = na.rm)
+  else if (isTRUE(row_value)) {
+    row_value <- rowMeans(x, na.rm = na.rm)
     hcr <- hclustfun(distfun(x))
     ddr <- as.dendrogram(hcr)
-    ddr <- reorder(ddr, Rowv)
+    ddr <- reorder(ddr, row_value)
     rowInd <- order.dendrogram(ddr)
     if (nr != length(rowInd))
       stop("row dendrogram ordering gave index of wrong length")
@@ -174,13 +174,13 @@ heatmap.function <- function(x,
   else {
     rowInd <- nr:1
   }
-  if (inherits(Colv, "dendrogram")) {
-    ddc <- Colv
+  if (inherits(cols_value, "dendrogram")) {
+    ddc <- cols_value
     colInd <- order.dendrogram(ddc)
   }
-  else if (identical(Colv, "Rowv")) {
+  else if (identical(cols_value, "row_value")) {
     if (nr != nc)
-      stop("Colv = \"Rowv\" but nrow(x) != ncol(x)")
+      stop("cols_value = \"row_value\" but nrow(x) != ncol(x)")
     if (exists("ddr")) {
       ddc <- ddr
       colInd <- order.dendrogram(ddc)
@@ -188,25 +188,25 @@ heatmap.function <- function(x,
     else
       colInd <- rowInd
   }
-  else if (is.integer(Colv)) {
+  else if (is.integer(cols_value)) {
     hcc <- hclustfun(distfun(if (symm)
       x
       else
         t(x)))
     ddc <- as.dendrogram(hcc)
-    ddc <- reorder(ddc, Colv)
+    ddc <- reorder(ddc, cols_value)
     colInd <- order.dendrogram(ddc)
     if (nc != length(colInd))
       stop("column dendrogram ordering gave index of wrong length")
   }
-  else if (isTRUE(Colv)) {
-    Colv <- colMeans(x, na.rm = na.rm)
+  else if (isTRUE(cols_value)) {
+    cols_value <- colMeans(x, na.rm = na.rm)
     hcc <- hclustfun(distfun(if (symm)
       x
       else
         t(x)))
     ddc <- as.dendrogram(hcc)
-    ddc <- reorder(ddc, Colv)
+    ddc <- reorder(ddc, cols_value)
     colInd <- order.dendrogram(ddc)
     if (nc != length(colInd))
       stop("column dendrogram ordering gave index of wrong length")
@@ -630,19 +630,19 @@ heatmap.function <- function(x,
 
 ```{r , include=FALSE}
 plant_abundance = replicate(100, rnorm(20))
-Garden_names = paste("Garden", letters[1:20], sep = "_")
+garden_names = paste("Garden", letters[1:20], sep = "_")
 Plant_ids = paste("Plant", c(1:100), sep = "_")
-rownames(plant_abundance) = Garden_names
+rownames(plant_abundance) = garden_names
 colnames(plant_abundance) = Plant_ids
 
 owner_gendercolors = sample(
   c("darkorchid", "darkred"),
-  length(Garden_names),
+  length(garden_names),
   replace = TRUE,
   prob = NULL
 )
 salescolors = sample(c("green", "darkgreen"),
-                     length(Garden_names),
+                     length(garden_names),
                      replace = TRUE,
                      prob = NULL)
 subtypecolors = sample(
@@ -720,8 +720,8 @@ heatmap.function(
   scale = "none",
   dendrogram = "both",
   margins = c(6, 12),
-  Rowv = TRUE,
-  Colv = TRUE,
+  row_value = TRUE,
+  cols_value = TRUE,
   ColSideColors = clab,
   RowSideColors = rlab,
   symbreaks = FALSE,
@@ -731,7 +731,7 @@ heatmap.function(
   trace = "none",
   main = main_title,
   labCol = FALSE,
-  labRow = Garden_names,
+  labRow = garden_names,
   cexRow = 1,
   col = rev(heat.colors(75)),
   ColSideColorsSize = 7,
