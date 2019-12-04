@@ -1,17 +1,5 @@
-#If not already installed
-#install.packages("gplots")
-#install.packages("devtools")
 
 
-#Load necessary packages
-library("gplots")
-library("devtools")
-
-#Load latest version of heatmap.3 function
-source_url("https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.3.R")
-
-#Set a working directory for output files
-#setwd("/Users/macbook/Publications/15 Uganda HomePlants/R/heatmap")
 
 #Create a dataset for demonstration purposes
 prob_matrix=replicate(100, rnorm(20))
