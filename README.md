@@ -2,7 +2,7 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 This code creates a simple clustered heatmap based on [obigriffith’s
-heatmap.function](https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.function.R)..
+heatmap.function](https://www.biostars.org/p/18211/)..
 
 ## Heatmap
 
