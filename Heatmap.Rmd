@@ -16,7 +16,7 @@ bibliography: packages.bib
 <!-- run_grammar_checker("HighDimensionalData.rmd”) -->
 
 <!-- Print pdf and word versions -->
-<!-- rmarkdown::render("HighDimensionalData.Rmd", output_format = "pdf_document") -->
+<!-- rmarkdown::render("Heatmap.Rmd", output_format = "pdf_document") -->
 <!-- rmarkdown::render("HighDimensionalData.Rmd", output_format = "word_document") -->
 
 ```{r setup, include=FALSE}
@@ -673,7 +673,7 @@ heatmap.function <- function(x,
 
 Here is an example for running the `heatmap.function` on a data set with few parameters. 
  
-```{r}
+```{r garden_matrix}
 
 garden_matrix <- matrix(1:100, byrow = T, nrow = 10)
 
@@ -703,7 +703,7 @@ heatmap.function(garden_matrix,
 
 Here is a more complex example with many parameters. First we create a dataset for demonstration purposes.
 
-```{r}
+```{r plant_abundance_data}
 plant_abundance = replicate(100, rnorm(20))
 Garden_names = paste("Garden", letters[1:20], sep = "_")
 Plant_ids = paste("Plant", c(1:100), sep = "_")
@@ -713,7 +713,7 @@ colnames(plant_abundance) = Plant_ids
 
 Create color side bars to represent other variables to compare.
 
-```{r color}
+```{r complex_colors}
 owner_gendercolors = sample(
   c("darkorchid", "darkred"),
   length(Garden_names),
@@ -758,7 +758,7 @@ NutritionContributioncolors = sample(c("black", "white", "grey"),
 
 Create labels
 
-```{r}
+```{r complex_labels}
 rlab = t(cbind(owner_gendercolors, salescolors))
 
 clab = cbind(
@@ -774,7 +774,7 @@ clab = cbind(
 
 Create row and column names.
 
-```{r}
+```{r complex_col_names}
 
 rownames(rlab) = c("Gender", "Economy")
 
@@ -791,14 +791,14 @@ colnames(clab) = c(
 
 Define `dist` and `hclust` functions for the heatmap using `stats` [@R-base]. 
 
-```{r}
+```{r mydist_myclust}
 mydist=function(c) {dist(c,method="euclidian")}
 myclust=function(c) {hclust(c,method="average")}
 ```
 
 Create heatmap using the `heatmap.function`.
 
-```{r, out.width = "100%", dpi=300}
+```{r complex_heat_plot, out.width = "100%", dpi=300}
 
 main_title = "Garden Plant Abundance"
 
@@ -962,7 +962,7 @@ dev.off()
 
 Following the simple example above we run the `heatmap.function` for visualizing data typical collected in ethnobotany surveys. We use the `ethnobotanydata` data set from `ethnobotanyR` [@R-ethnobotanyR].
  
-```{r}
+```{r ethno_matrix}
 
 ethno_matrix <- as.matrix(dplyr::select(ethnobotanydata, -sp_name, -informant))
 
