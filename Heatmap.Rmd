@@ -875,13 +875,13 @@ legend(
 
 ```
 
-# Make a PDF
+# Make an image file
 
-Create a pdf of the heatmap using `grDevices` [@R-base] and `heatmap.function`.
+Create a png of the heatmap using `grDevices` [@R-base] and `heatmap.function`.
 
 ```{r offscreen}
 
-pdf(file="garden_heatmap.pdf")
+png(file="garden_heatmap.png")
 main_title="Garden Plant Abundance"
 
 par(cex.main=1)
