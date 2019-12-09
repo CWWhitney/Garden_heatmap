@@ -56,7 +56,7 @@ Needless to say any aims objectives and hypotheses should be determined before a
 
 ## Heatmap function
 
-We use a garden heatmap function `heatmap.function` after [obigriffith's heatmap.function](https://raw.githubusercontent.com/obigriffith/biostar-tutorials/master/Heatmaps/heatmap.function.R). We use `grDevices` heat.colors for filling the heatmap. Other colors can be chose from the `RColorBrewer` library [@R-RColorBrewer].
+We use a garden heatmap function `heatmap.function` after [obigriffith's heatmap.function](https://www.biostars.org/p/18211/). We use `grDevices` `terrain.colors` for filling the heatmap. Other colors can be chose from the `RColorBrewer` library [@R-RColorBrewer].
 
 ```{r heatmap.function, include=FALSE}
 heatmap.function <- function(x,
@@ -76,7 +76,7 @@ heatmap.function <- function(x,
                              breaks,
                              symbreaks = max(x < 0, na.rm = TRUE) ||
                                scale != "none",
-                             col = "heat.colors",
+                             col = "terrain.colors",
                              colsep,
                              rowsep,
                              sepcolor = "white",
@@ -423,7 +423,7 @@ heatmap.function <- function(x,
   if (revC) {
     iy <- nr:1
     if (exists("ddr"))
-      ddr <- rev(ddr)
+      ddr <- ddr
     x <- x[, iy]
     cellnote <- cellnote[, iy]
   }
@@ -545,7 +545,7 @@ heatmap.function <- function(x,
                lty = 2)
       }
       yv <- rep(i, ncol(x.scaled)) + x.scaled[i,] - 0.5
-      yv <- rev(c(yv[1], yv))
+      yv <- c(yv[1], yv)
       xv <- length(yv):1 - 0.5
       lines(
         x = xv,
@@ -796,7 +796,7 @@ mydist=function(c) {dist(c,method="euclidian")}
 myclust=function(c) {hclust(c,method="average")}
 ```
 
-Create heatmap using the `heatmap.function`.
+Create heatmap using the `heatmap.function`. Colors for the map are from `grDevices` `terrain.colors` [@R-base].
 
 ```{r complex_heat_plot, out.width = "100%", dpi=300}
 
@@ -824,7 +824,7 @@ heatmap.function(
   labCol = FALSE,
   labRow = Garden_names,
   cexRow = 1,
-  col = rev(heat.colors(75)),
+  col = terrain.colors(n=10, alpha=1),
   ColSideColorsSize = 7,
   RowSideColorsSize = 2,
   KeyValueName = "Plant density"
@@ -907,7 +907,7 @@ heatmap.function(
   labCol = FALSE,
   labRow = Garden_names,
   cexRow = 1,
-  col = rev(heat.colors(75)),
+  col = terrain.colors(75),
   ColSideColorsSize = 7,
   RowSideColorsSize = 2,
   KeyValueName = "Prob. Response"
